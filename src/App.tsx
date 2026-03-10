@@ -88,11 +88,23 @@ export default function App() {
   }, [checkedIds]);
 
   const resultData = useMemo(() => {
+    // Find "good" items that the user DID NOT check
+    const uncheckedGoodItems = QUIZ_ITEMS.filter(item => item.status === 'good' && !checkedIds.has(item.id));
+    
+    // Pick a specific recommendation
+    let dynamicMission = '';
+    if (uncheckedGoodItems.length > 0) {
+      // Pick the first one as a recommendation
+      dynamicMission = `내일은 "${uncheckedGoodItems[0].text}" 어때요?`;
+    } else {
+      dynamicMission = '모든 좋은 습관을 실천하셨네요! 최고예요! 🌟';
+    }
+
     if (greenCount >= 7) {
       return {
         title: '에코 히어로',
         description: '와우! 당신은 지구를 지키는 진정한 환경 지킴이예요! 친구들에게도 노하우를 알려주세요.',
-        mission: '친구들에게 전파하기! 📢',
+        mission: dynamicMission,
         icon: <Leaf className="w-20 h-20 text-emerald-400" />,
         color: 'border-emerald-500/50 shadow-emerald-500/20',
         badge: '7 ~ 10개',
@@ -102,7 +114,7 @@ export default function App() {
       return {
         title: '그린 워커',
         description: '잘하고 있어요! 조금만 더 노력하면 지구가 훨씬 건강해질 거예요.',
-        mission: '습관 하나 더 만들기! ✨',
+        mission: dynamicMission,
         icon: <Footprints className="w-20 h-20 text-yellow-400" />,
         color: 'border-yellow-500/50 shadow-yellow-500/20',
         badge: '4 ~ 6개',
@@ -112,14 +124,14 @@ export default function App() {
       return {
         title: '탄소 빌런',
         description: '앗! 지구가 아파하고 있어요. 오늘부터 하나씩 바꾸면 충분히 영웅이 될 수 있어요!',
-        mission: '지금 바로 하나 실천하기! 🔥',
+        mission: dynamicMission,
         icon: <CloudRain className="w-20 h-20 text-red-400" />,
         color: 'border-red-500/50 shadow-red-500/20',
         badge: '0 ~ 3개',
         badgeColor: 'bg-red-500/20 text-red-400'
       };
     }
-  }, [greenCount]);
+  }, [greenCount, checkedIds]);
 
   const resetQuiz = () => {
     setCheckedIds(new Set());
